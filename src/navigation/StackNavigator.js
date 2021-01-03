@@ -8,15 +8,19 @@ import EditProfile from '../components/EditProfile';
 import Connexion from '../components/Connexion';
 import creerCompte from '../components/CreerCompte';
 import Acceuil from '../components/Acceuil';
-
+import { Provider as AuthProvider } from '../context/AuthContext';
+import { setNavigator } from '../navigationRef';
+import ResolveAuthScreen from './../ResolveAuthScreen';
 
 
 
 const Stack = createStackNavigator();
 export default function StackNav() {
     return (
-        <NavigationContainer>
+        <AuthProvider>
+        <NavigationContainer >
             <Stack.Navigator>
+            <Stack.Screen name="Resolve" component={ResolveAuthScreen} options={{ headerShown: false }}></Stack.Screen>
                 <Stack.Screen name="Acceuil" component={Acceuil} options={{ headerShown: false }}></Stack.Screen>
                 <Stack.Screen name="Connexion" component={Connexion} options={{ headerShown: false }}></Stack.Screen>
                 <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false }}></Stack.Screen>
@@ -26,5 +30,6 @@ export default function StackNav() {
                 <Stack.Screen name="Edit" component={EditProfile} options={{ headerShown: false }}></Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
+        </AuthProvider>
     )
 }

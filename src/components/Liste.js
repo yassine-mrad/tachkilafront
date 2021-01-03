@@ -15,10 +15,21 @@ import {
     FlatList,
     Button,
 } from 'react-native';
+import authcontext from '../context/AuthContext';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import {PartiesData } from './PartiesData';
+import { Context as AuthContext } from '../context/AuthContext' ;
 
 class Liste extends Component {
+    static contextType = AuthContext;
+    componentDidMount() {
+
+        const token  = this.context;
+        console.log(token); // { name: "Jhon snow", address: "USA", mobile: ""90899034234"" }
+     
+      }
+    
     DATA = [
         {
             id: 1,
@@ -50,8 +61,11 @@ class Liste extends Component {
         },
     ]
     constructor(props) {
+       
         super(props);
         this.state = { sampleText: 'Rejoindre' };
+        
+       
     }
     changeTextValue = () => {
         this.setState({ sampleText: 'Invitation envoyée' });
@@ -97,6 +111,7 @@ class Liste extends Component {
 
 
     render() {
+        
         return (
 
             <View style={styles.container} >

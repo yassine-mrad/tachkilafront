@@ -1,70 +1,56 @@
-import React, { Component } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable'
+import { Context as AuthContext } from '../context/AuthContext' ;
 
-import Icon from 'react-native-vector-icons/FontAwesome'
-import DatePicker from 'react-native-datepicker'
-import { Picker } from '@react-native-community/picker'
-import LinearGradient from 'react-native-linear-gradient'
-
-
-class Profile extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nom: 'Ben Foulen',
-            prenom: 'Foulen',
-            email: 'foulen@gmail.com',
-            tel: '123456789',
-            profession: 'Etudiant',
-            dateDeNaissance: '17-01-1994',
-            localisation: 'Kalaa Sghira',
-            niveau: 'Intermédiaire'
-        };
-    }
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Liste')}>
-                    <MaterialCommunityIcons name="keyboard-backspace" color={'#00818A'} size={50} />
-                </TouchableOpacity>
-                <View style={styles.iconUser}>
-                    <MaterialCommunityIcons name="account-circle" color={'#00818A'} size={80} />
-                </View>
-
-                <Animatable.View animation="fadeInUpBig"
-                    style={styles.footer}>
-                    <ScrollView>
-                        <View style={styles.item}>
-                            <Text style={styles.text}>Nom : {this.state.nom}</Text>
-                            <Text style={styles.text}>Prénom : {this.state.prenom}</Text>
-                            <Text style={styles.text}>Adresse email : {this.state.email}</Text>
-                            <Text style={styles.text}>Télèphone : {this.state.tel}</Text>
-                            <Text style={styles.text}>Date de naissance : {this.state.dateDeNaissance}</Text>
-                            <Text style={styles.text}>Localisation : {this.state.localisation}</Text>
-                            <Text style={styles.text}>Niveau : {this.state.niveau}</Text>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Edit')}>
-                                <Text style={styles.edit} >Modifier mes infos</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.bouton}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Connexion')}>
-                                <Text style={styles.deconnexion}>Déconnexion</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ScrollView>
-                </Animatable.View>
-
-
+const Profile = (props) => {
+    const { signout  } = useContext(AuthContext);
+         const   [nom,setnom]=useState('Ben Foulen');
+         const   [prenom,setprenom]=useState('Foulen');
+         const   [email,setemail]=useState('foulen@gmail.com');
+         const  [tel,settel]=useState('123456789');
+         const   [profession,setprofession]=useState('Etudiant');
+            const   [dateDeNaissance,setdateDeNaissance]=useState('17-01-1994');
+            const  [localisation,setlocalisation]=useState('Kalaa Sghira');
+            const  [niveau,setniveau]=useState('Intermédiaire');
+    return (
+        <View style={styles.container}>
+            
+            <View style={styles.iconUser}>
+                <MaterialCommunityIcons name="account-circle" color={'#00818A'} size={80} />
             </View>
-        )
-    }
-}
-//            
 
+            <Animatable.View animation="fadeInUpBig"
+                style={styles.footer}>
+                <ScrollView>
+                    <View style={styles.item}>
+                        <Text style={styles.text}>Nom : {nom}</Text>
+                        <Text style={styles.text}>Prénom : {prenom}</Text>
+                        <Text style={styles.text}>Adresse email : {email}</Text>
+                        <Text style={styles.text}>Télèphone : {tel}</Text>
+                        <Text style={styles.text}>Date de naissance : {dateDeNaissance}</Text>
+                        <Text style={styles.text}>Localisation : {localisation}</Text>
+                        <Text style={styles.text}>Niveau : {niveau}</Text>
+                        <TouchableOpacity onPress={() => props.navigation.navigate('Edit')}>
+                            <Text style={styles.edit} >Modifier mes infos</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.bouton}>
+                        <TouchableOpacity onPress={() => signout(props.navigation.navigate)}>
+                            <Text style={styles.deconnexion}>Déconnexion</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </Animatable.View>
+
+
+        </View>
+    );
+};
+
+// define your styles
 
 const styles = StyleSheet.create({
     container: {
@@ -122,4 +108,5 @@ const styles = StyleSheet.create({
     
 })
 
+//make this component available to the app
 export default Profile;

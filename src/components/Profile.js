@@ -1,20 +1,51 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState,useEffect } from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable'
+import Moment from 'moment';
 import { Context as AuthContext } from '../context/AuthContext' ;
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
+import tachkilaApi from '../api/tachkila';
 
 const Profile = (props) => {
-    const { signout  } = useContext(AuthContext);
-         const   [nom,setnom]=useState('Ben Foulen');
-         const   [prenom,setprenom]=useState('Foulen');
-         const   [email,setemail]=useState('foulen@gmail.com');
-         const  [tel,settel]=useState('123456789');
-         const   [profession,setprofession]=useState('Etudiant');
-            const   [dateDeNaissance,setdateDeNaissance]=useState('17-01-1994');
-            const  [localisation,setlocalisation]=useState('Kalaa Sghira');
-            const  [niveau,setniveau]=useState('Intermédiaire');
+    const { signout ,state } = useContext(AuthContext);
+         const   [nom,setnom]=useState('');
+         const   [prenom,setprenom]=useState('');
+         const   [email,setemail]=useState('');
+         const  [tel,settel]=useState('');
+         const   [profession,setprofession]=useState('');
+            const   [dateDeNaissance,setdateDeNaissance]=useState('');
+            const  [localisation,setlocalisation]=useState('');
+            const  [niveau,setniveau]=useState('');
+
+useEffect(() => {
+    setTimeout(    async () => {
+       
+        const user = await AsyncStorage.getItem('iduser');
+    console.log(user);
+    
+    const response = await tachkilaApi.post('/user',{userid:user});
+    const joueur=response.data;
+    console.log(joueur.nom);
+    const {nom}=joueur;
+    setnom(joueur.data.nom); 
+    console.log(joueur.data);
+    setprenom(joueur.data.prenom);
+    settel(joueur.data.telephone); 
+    setprofession(joueur.data.profession);
+    setdateDeNaissance(joueur.data.datenaissance);
+    setlocalisation(joueur.data.localisation);
+    setniveau(joueur.data.niveau);
+    setemail(joueur.data.email);
+    console.log(nom);
+
+    
+   
+},0)
+
+
+}, [state]);
     return (
         <View style={styles.container}>
             
@@ -30,7 +61,7 @@ const Profile = (props) => {
                         <Text style={styles.text}>Prénom : {prenom}</Text>
                         <Text style={styles.text}>Adresse email : {email}</Text>
                         <Text style={styles.text}>Télèphone : {tel}</Text>
-                        <Text style={styles.text}>Date de naissance : {dateDeNaissance}</Text>
+                        <Text style={styles.text}>Date de naissance : {Moment(dateDeNaissance).format('DD MM YYYY')} </Text>
                         <Text style={styles.text}>Localisation : {localisation}</Text>
                         <Text style={styles.text}>Niveau : {niveau}</Text>
                         <TouchableOpacity onPress={() => props.navigation.navigate('Edit')}>
@@ -38,7 +69,13 @@ const Profile = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.bouton}>
-                        <TouchableOpacity onPress={() => signout(props.navigation.navigate)}>
+                        <TouchableOpacity onPress={ () => {
+                            
+                                
+                                props.navigation.navigate('Connexion');
+                        
+                            
+                        }}>
                             <Text style={styles.deconnexion}>Déconnexion</Text>
                         </TouchableOpacity>
                     </View>

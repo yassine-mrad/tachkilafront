@@ -4,33 +4,20 @@ import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useRoute,useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import Moment from 'moment'
 
 
 
-
-
-class DetailsPartie extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            place: 'Kalaa Sghira',
-            title: 'Les médecins',
-            date: '01/12/2020',
-            time: '14:00',
-            age: '20-25',
-            niveau: 'Intermediaire',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna wirl aliqua. Up exlaborum incididunt',
-            nmax: 10,
-            ndispo: 5,
-            date: '29/11/2020',
-            heure: '15:00',
-        };
-    }
-
-    render() {
+const DetailsPartie =()=>  {
+    const route=useRoute();
+    const data =route.params.data;
+    const navigation=useNavigation();
+    const [rejoindre,setRejoindre]=useState(true);
         return (
             <View style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Liste')}>
+                <TouchableOpacity onPress={() =>navigation.navigate('Liste')}>
                     <MaterialCommunityIcons name="keyboard-backspace" color={'#00818A'} size={50} />
                 </TouchableOpacity>
                 <ScrollView>
@@ -44,13 +31,13 @@ class DetailsPartie extends Component {
 
                             }}>
                                 <FontAwesome5 name={'map-marker-alt'} size={20} left={50} />
-                                <Text style={{ textAlign: 'left', marginLeft: 5 }}>{this.state.place}</Text>
+                                <Text style={{ textAlign: 'left', marginLeft: 5 }}>{data.localisation}</Text>
                             </View>
                             <View style={styles.contenu}>
-                                <Text style={styles.text}>{this.state.title}</Text>
-                                <Text style={styles.text}>Crée par: Foulen  </Text>
-                                <Text>Tranches d'age: {this.state.age}</Text>
-                                <Text>Niveau: {this.state.niveau}</Text>
+                                <Text style={styles.text}>{data.titre}</Text>
+                                
+                                <Text>Tranches d'age: {data.tranchedage}</Text>
+                                <Text>Niveau: {data.niveau}</Text>
                             </View>
                             <View style={styles.contenu, {
                                 position: 'absolute',
@@ -61,18 +48,21 @@ class DetailsPartie extends Component {
                                 borderWidth: 2,
                                 borderColor: '#707070',
                                 paddingLeft: 10,
+                               
                             }}
                             >
 
                                 <Text style={{ marginBottom: 10, }}>Description:</Text>
-                                <Text>{this.state.description}</Text>
-                                <Text style={{ marginTop: 10, }}>Nombre de joueurs maximal:{this.state.nmax}</Text>
-                                <Text style={{ marginTop: 10, }}>Nombre de joueurs disponible:{this.state.ndispo}</Text>
+                                <Text>{data.description}</Text>
+                                <Text style={{ marginTop: 10, }}>Nombre de joueurs maximal:{data.nombre}</Text>
+                                {/* <Text style={{ marginTop: 10, }}>Nombre de joueurs disponible:{this.state.ndispo}</Text> */}
 
                             </View>
-                            <Text style={{ marginBottom: 10, }}>Date: {this.state.date}</Text>
-                            <Text style={{ marginBottom: 10, }}>Heure: {this.state.heure}</Text>
-                        
+                            <Text style={{ marginTop:10 }}>Date: {Moment(data.dateestime).format("DD/MM/YYYY")}</Text>
+                            <Text style={{ marginBottom: 10, }}>Heure: {Moment(data.dateestime).format("hh:mm")}</Text>
+                            <TouchableOpacity style={styles.bouton} onPress={()=>setRejoindre(!rejoindre)} >
+                    <Text style={styles.rejoindre}>{rejoindre ? "Rejoindre" : "Invitation Envoyé"}</Text>
+                </TouchableOpacity>
                     </View>
                    
 
@@ -82,7 +72,7 @@ class DetailsPartie extends Component {
             </View>
         )
     }
-}
+
 //            
 
 
@@ -141,6 +131,14 @@ const styles = StyleSheet.create({
         left: "10%"
 
     },
+    bouton: {
+        left: '60%',
+        
+        },
+    rejoindre:{
+            color:'#00EFA1'
+            
+        }
 
 
 

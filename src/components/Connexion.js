@@ -1,7 +1,7 @@
-import React,{  useContext,useState }  from 'react';
+import React,{  useContext,useState ,useEffect}  from 'react';
 import { View, StyleSheet, Text, Alert,ActivityIndicator } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import LinearGradient from 'react-native-linear-gradient'
@@ -58,6 +58,16 @@ function loginHandle(email, motdepasse) {
     }
     else Alert.alert('Bravo !'); return;
 }
+
+
+useEffect(() => {
+    const getResult = async () => {
+        const result = await AsyncStorage.removeItem('iduser');
+        const hello = await AsyncStorage.removeItem('token');
+    };
+
+    getResult();
+}, []);
 
 if(loading)
     {

@@ -5,8 +5,10 @@
  * @format
  * @flow strict-local
  */
+
 import 'react-native-gesture-handler';
-import React, { Component } from 'react';
+import React, {Component } from 'react';
+import { useEffect, useState } from 'react';
 import {
     StyleSheet,
     View,
@@ -20,50 +22,30 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {PartiesData } from './PartiesData';
 import { Context as AuthContext } from '../context/AuthContext' ;
-
+import instance from '../api/tachkila'
+import Moment from 'moment'
 class Liste extends Component {
     static contextType = AuthContext;
-    componentDidMount() {
-
-        const token  = this.context;
-        console.log(token); // { name: "Jhon snow", address: "USA", mobile: ""90899034234"" }
-     
-      }
     
-    DATA = [
-        {
-            id: 1,
-            place: 'Kalaa Sghira',
-            title: 'Les médecins',
-            date: '01/12/2020',
-            time: '14:00',
-        },
-        {
-            id: 2,
-            place: 'Akouda',
-            title: 'Les ingénieurs',
-            date: '01/12/2020',
-            time: '13:00',
-        },
-        {
-            id: 3,
-            place: 'Sousse',
-            title: 'Les médecins',
-            date: '01/12/2020',
-            time: '14:00',
-        },
-        {
-            id: 4,
-            place: 'Sousse',
-            title: 'Les médecins',
-            date: '01/12/2020',
-            time: '14:00',
-        },
-    ]
+    componentDidMount() {
+        
+        const token  = this.context;
+        console.log(token); 
+        this.loadMessages();
+      }
+    loadMessages =() =>{
+        instance.get('/parties').then(res =>{
+            this.setState({messages:res.data})
+            console.log('/messages/index', res.data);
+            console.log('/index', res.data.titre);
+        })
+    }
+   
     constructor(props) {
        
         super(props);
-        this.state = { sampleText: 'Rejoindre' };
+        this.state = { sampleText: 'Rejoindre' ,
+                        messages:null};
         
        
     }
@@ -76,8 +58,9 @@ class Liste extends Component {
             {this.state.sampleText}
         </Text>
     }
+
     renderItem = ({ item }) => (
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('Details')} >
+        <TouchableOpacity onPress={() => this.props.navigation.navigate('Details',{data:item})} >
             <View style={styles.item}>
                 <View style={{
                     left: '100%',
@@ -86,21 +69,19 @@ class Liste extends Component {
 
                 }}>
                     <FontAwesome5 name={'map-marker-alt'} size={20} left={50} />
-                    <Text style={{ textAlign: 'left', marginLeft: 5 }}>{item.place}</Text>
+                    <Text style={{ textAlign: 'left', marginLeft: 5 }}>{item.localisation}</Text>
                 </View>
                 <View style={styles.contenu}>
-                    <Text style={styles.text}>{item.title}</Text>
-                    <Text>Date: {item.date}</Text>
-                    <Text>Heure: {item.time}</Text>
+                    <Text style={styles.text}>{item.titre}</Text>
+                    <Text>Date: {Moment(item.dateestime).format("DD/MM/YYYY")}</Text>
+                    <Text>Heure: {Moment(item.dateestime).format("hh:mm")}</Text>
                 </View>
                 {/* <Button
                     onPress={this._onPressButton}
                     title="Change Text!"
                     color="#00ced1"
                 /> */}
-                <TouchableOpacity style={styles.bouton}  >
-                    <Text>REJOINDRE</Text>
-                </TouchableOpacity>
+               
             </View>
         </TouchableOpacity>
 
@@ -108,10 +89,10 @@ class Liste extends Component {
 
 
     )
-
+   
 
     render() {
-        
+     
         return (
 
             <View style={styles.container} >
@@ -146,9 +127,9 @@ class Liste extends Component {
 
                 </View>
                 <FlatList
-                    data={this.DATA}
+                    data={this.state.messages}
                     renderItem={this.renderItem}
-                    keyExtractor={item => item.id.toString()}
+                    keyExtractor={item => item._id.toString()}
                 />
 
             </View>
@@ -198,9 +179,6 @@ const styles = StyleSheet.create({
     contenu: {
         flex: 2,
     },
-    bouton: {
-        left: '60%',
-        }
+ 
 });
 export default Liste;
-

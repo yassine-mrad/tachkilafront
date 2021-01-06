@@ -1,208 +1,275 @@
-import React,{useState} from 'react'
-
+import React, { useContext,useState,useEffect } from 'react'
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
-import { View, StyleSheet, Text, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ScrollView ,Button} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
-import DatePicker from 'react-native-datepicker'
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-community/picker'
 import LinearGradient from 'react-native-linear-gradient'
 import Textarea from 'react-native-textarea';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
+import { Context as AuthContext } from '../context/AuthContext';
+const Create = (props) => {
+    const { state, partie, clearErrorMessage } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
 
-export default class Create extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
 
-            check_textInputChange: false,
+    const [niveau, setNiveau] = useState('Debutant');
+    const [dateestime, setdateestime] = useState(new Date(1598051730000));
+    const [titre,setTitre]=useState('');
+    const [nombre,setNombre]=useState(null);
+    const [localisation,setLocalisation]=useState('');
+    const [description,setDescription]=useState('');
+    const [tranchedage,setTranchedage]=useState('15-20');
 
-            select: 'niveau'
-        }
-    }
-    textInputChange = (val) => {
-        if (val.length !== 0) {
-            this.setState({
-                ...this.state,
-                check_textInputChange: true
-            });
+
+    const [isValideTitre,setisValideTitre]=useState(true);
+    const [isValideNbjoueurs,setisValideNbjoueurs]=useState(true);
+    const [isValideLocalisation,setisValideLocalisation]=useState(true);
+
+    
+    const [date, setDate] = useState(new Date(1598051730000));
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+  
+    const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate || date;
+      setShow(Platform.OS === 'ios');
+      setdateestime(currentDate);
+    };
+  
+    const showMode = (currentMode) => {
+      setShow(true);
+      setMode(currentMode);
+    };
+  
+    const showDatepicker = () => {
+      showMode('date');
+    };
+  
+    const showTimepicker = () => {
+        showMode('time');
+      };
+
+
+
+
+
+
+
+    function handleValidTitre(val) {
+        if (val.trim().length >= 4) {
+            setisValideTitre(true); 
         } else {
-            this.setState({
-                ...this.state,
-                check_textInputChange: false
-            });
+            setisValideTitre(false);
         }
     }
-
-
-    render() {
+    function handleValidLocalisation(val) {
+        if (val.trim().length >= 4) {
+            setisValideLocalisation(true); 
+        } else {
+            setisValideLocalisation(false);
+        }
+    }
+    function handleValidNbjoueurs(val) {
+        if ((val<= 20)&&(val>=8)) {
+            setisValideNbjoueurs(true); 
+        } else {
+            setisValideNbjoueurs(false);
+        }
+    }
+    const [userId,setUserId] =useState(null);
+    useEffect(() => {
+        setTimeout(    async () => {
+           
+            const user = await AsyncStorage.getItem('iduser');
+            setUserId(user);
+    
+        
        
-        return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.text_header}>Créer Une Equipe!</Text>
-                </View>
-                <Animatable.View animation="fadeInUpBig"
-                    style={styles.footer}>
-                    <ScrollView>
+    },0)
+    
+    
+    }, [state]);
 
-                        <View style={{
-                            flexDirection: 'row', borderBottomWidth: 1,
-                            borderBottomColor: '#f2f2f2',
-                            paddingBottom: 5
-                        }}>
+    return (
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.text_header}>Créer Une Equipe!</Text>
+            </View>
+            <Animatable.View animation="fadeInUpBig"
+                style={styles.footer}>
+                <ScrollView>
 
-                            <TextInput
-                                placeholder="Nom de l'équipe"
-                                style={styles.textInput}
-                                autoCapitalize="none"
-                                onChangeText={(val) => this.textInputChange(val)}
-                            />
-                            {this.state.check_textInputChange ?
-                                <Animatable.View
-                                    animation="bounceIn">
-                                    <Icon
-                                        name="check-circle"
-                                        color="green"
-                                        size={20}
-                                    />
-                                </Animatable.View> : null}
-                        </View>
+                    <View style={{
+                        flexDirection: 'row', borderBottomWidth: 1,
+                        borderBottomColor: '#f2f2f2',
+                        paddingBottom: 5
+                    }}>
 
-                        <View style={styles.action}>
-                            <Picker
-                                selectedValue={this.state.niveau}
-                                style={{ height: 50, width: 150, color: '#05375a' }}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    this.setState({ niveau: itemValue })
-                                }
-                            >
-
-                                <Picker.Item label="15-20" />
-                                <Picker.Item label="20-25" />
-                                <Picker.Item label="25-30" />
-                            </Picker>
-                        </View>
-
-                        <View style={styles.action}>
-
-                            <TextInput
-                                placeholder="Nombre de joueurs"
-                                style={styles.textInput}
-                                keyboardType="numeric"
-                                autoCapitalize="none"
-                                onChangeText={(val) => this.textInputChange(val)}
-                            />
-                            {this.state.check_textInputChange ?
-                                <Animatable.View
-                                    animation="bounceIn">
-                                    <Icon
-                                        name="check-circle"
-                                        color="green"
-                                        size={20}
-                                    />
-                                </Animatable.View> : null}
-                        </View>
-                        <View style={styles.action}>
-                            <Picker
-                                selectedValue={this.state.niveau}
-                                style={{ height: 50, width: 150, color: '#05375a' }}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    this.setState({ niveau: itemValue })
-                                }
-                            >
-
-                                <Picker.Item label="Débutant" value="debutant" />
-                                <Picker.Item label="Intérmediaire" value="intermediaire" />
-                                <Picker.Item label="Avancé" value="avancé" />
-                            </Picker>
-                        </View>
-
-
-                        <View style={styles.action}>
-
-                            <TextInput
-                                placeholder="Localisation"
-                                style={styles.textInput}
-                                autoCapitalize="none"
-                                onChangeText={(val) => this.textInputChange(val)}
-                            />
-                            {this.state.check_textInputChange ?
-                                <Animatable.View
-                                    animation="bounceIn">
-                                    <Icon
-                                        name="check-circle"
-                                        color="green"
-                                        size={20}
-                                    />
-                                </Animatable.View> : null}
-                        </View>
-
+                        <TextInput
+                            placeholder="Nom de l'équipe"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(titre) => {
+                                setTitre(titre)
+                            }}
+                            onEndEditing={(e) => handleValidTitre(e.nativeEvent.text)}
+                        />
                         
-                        <View style={styles.action}>
-                            <DatePicker
-                                placeholder="Heure estimée de la partie"
-                                style={{ width: 200 }}
-                                mode="date"
-                                format="YYYY-MM-DD"
-                                minDate="2006-01-01"
-                                maxDate="1970-01-01"
-                                confirmBtnText="Confirmer"
-                                cancelBtnText="Annuler"
+                    
+                    </View>
+                    {isValideTitre ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} >Titre doit contenir plus que 5 caractères</Text>
+                        </Animatable.View>
+                    }
 
-                            />
-                        </View>
+                    <View style={styles.action}>
+                        <Picker
+                            selectedValue={niveau}
+                            style={{ height: 50, width: 150, color: '#05375a' }}
+                            onValueChange={(itemValue, itemIndex) =>{setNiveau(itemValue)}
+                            }
+                        >
 
-                        <Textarea
-                            containerStyle={styles.textareaContainer}
-                            style={styles.textarea}
+                            <Picker.Item label="Débutant" value="debutant" />
+                            <Picker.Item label="Intérmediaire" value="intermediaire" />
+                            <Picker.Item label="Avancé" value="avancé" />
+                        </Picker>
+                    </View>
 
-                            maxLength={120}
-                            placeholder={'Description'}
+                    <View style={styles.action}>
+
+                        <TextInput
+                            placeholder="Nombre de joueurs"
+                            style={styles.textInput}
+                            keyboardType="numeric"
+                            autoCapitalize="none"
+                            onChangeText={(nombre) => setNombre(nombre)}
+                            onEndEditing={(e) => handleValidNbjoueurs(e.nativeEvent.text)}
 
                         />
+                       
+                    </View>
+                    {isValideNbjoueurs ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} >Minimum 8 et maximum 20</Text>
+                        </Animatable.View>
+                    }
+                    <View style={styles.action}>
+                        <Picker
+                            selectedValue={tranchedage}
+                            style={{ height: 50, width: 150, color: '#05375a' }}
+                            onValueChange={(itemValue, itemIndex) =>{setTranchedage(itemValue)}
+                            }
+                        >
+
+                            <Picker.Item label="15-20" value="15-20" />
+                            <Picker.Item label="20-25" value="20-25" />
+                            <Picker.Item label="25-30" value="25-30" />
+                        </Picker>
+                    </View>
+
+
+                    <View style={styles.action}>
+
+                        <TextInput
+                            placeholder="Localisation"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(localisation) => setLocalisation(localisation)}
+                            onEndEditing={(e) => handleValidLocalisation(e.nativeEvent.text)}
+                        />
+                        
+                    </View>
+                    {isValideLocalisation ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} >Localisation doit contenir plus que 5 caractères</Text>
+                        </Animatable.View>
+                    }
+
+
+                    <View style={styles.action}>
+                    <View>
+      <View>
+        <Button onPress={showDatepicker} title="Show date picker!" />
+      </View>
+      <View>
+        <Button onPress={showTimepicker} title="Show date picker!" />
+      </View>
+      {show && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={dateestime}
+          mode={mode}
+          is24Hour={true}
+          display="default"
+          onChange={onChange}
+        />
+      )}
+    </View>
+                    </View>
+
+                    <Textarea
+                        containerStyle={styles.textareaContainer}
+                        style={styles.textarea}
+
+                        maxLength={120}
+                        placeholder={'Description'}
+                        onChangeText={(description) => setDescription(description)}
+
+                    />
 
 
 
 
-                        <View style={styles.button}>
-                            <TouchableOpacity
+                    <View style={styles.button}>
+                        <TouchableOpacity
+                            style={styles.signIn}
+                            onPress={async () => {
+                                console.log({userId,titre,nombre,niveau,dateestime,localisation,description,tranchedage })
+                                setLoading(true);
+                                const a=Number(nombre);
+                                await partie({userId,titre,a,niveau,dateestime,localisation,description,tranchedage }, props.navigation.navigate)
+
+                                setLoading(false);
+                            }}
+                          
+                        >
+                            <LinearGradient
+                                colors={['#08d4c4', '#00EAA1']}
                                 style={styles.signIn}
-                                onPress={() => this.props.navigation.navigate('TabNavigator')}
                             >
-                                <LinearGradient
-                                    colors={['#08d4c4', '#00EAA1']}
-                                    style={styles.signIn}
-                                >
-                                    <Text style={[styles.textSign, {
-                                        color: '#fff'
-                                    }]}>Créer Une Equipe</Text>
-                                </LinearGradient>
-                            </TouchableOpacity>
+                                <Text style={[styles.textSign, {
+                                    color: '#fff'
+                                }]}>Créer Une Equipe</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
 
-                            <TouchableOpacity
-                                onPress={() => this.props.navigation.goBack()}
-                                style={[styles.signIn, {
-                                    borderColor: '#00EAA1',
-                                    borderWidth: 1,
-                                    marginTop: 15
-                                }]}
-                            >
-                                <Text style={{
-                                    color: '#009387'
-                                }}>Annuler</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.goBack()}
+                            style={[styles.signIn, {
+                                borderColor: '#00EAA1',
+                                borderWidth: 1,
+                                marginTop: 15
+                            }]}
+                        >
+                            <Text style={{
+                                color: '#009387'
+                            }}>Annuler</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    </ScrollView>
-                </Animatable.View>
+                </ScrollView>
+            </Animatable.View>
 
 
 
-            </View>
-        )
+        </View>
+    )
 
-    }
+
 }
 
 
@@ -272,6 +339,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
     },
+    errorMsg: {
+        color: '#ff0000',
+        fontSize: 14
+    },
 
 
 })
+export default Create;

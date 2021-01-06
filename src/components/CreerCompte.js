@@ -1,39 +1,114 @@
 //import liraries
-import React ,{  useContext,useState }  from 'react'
+import React, { useContext, useState } from 'react'
 
 import * as Animatable from 'react-native-animatable'
-import { View, StyleSheet, Text, ScrollView ,ActivityIndicator} from 'react-native'
+import { View, StyleSheet, Text, ScrollView, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DatePicker from 'react-native-datepicker'
 import { Picker } from '@react-native-community/picker'
 import LinearGradient from 'react-native-linear-gradient'
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
-import { Context as AuthContext } from '../context/AuthContext' ;
+import { Context as AuthContext } from '../context/AuthContext';
 
 // create a component
 const CreerCompte = (props) => {
 
-    const { state, signup ,clearErrorMessage  } = useContext(AuthContext);
+    const { state, signup, clearErrorMessage } = useContext(AuthContext);
+
+    const [loading, setLoading] = useState(false);
+
+    const [nom, setNom] = useState('');
+    const [prenom, setPrenom] = useState('');
+    const [email, setEmail] = useState('');
+    const [motdepasse, setmotdepasse] = useState('');
+    const [datenaissance, setDatenaissance] = useState('2000-01-01');
+    const [localisation, setLocalisation] = useState('');
+    const [telephone, setTelephone] = useState('');
+    const [profession, setProfession] = useState('');
+    const [niveau, setniveau] = useState('Debutant');
+    const [confirm_motdepasse, setConfirm_motdepasse] = useState(true);
+
+    const [secureTextEntry, setsecureTextEntry] = useState(true);
+
+    const [confirm_secureTextEntry, setConfirm_secureTextEntry] = useState(true);
+
+    const [isvalideNom, setisValideNom] = useState(true);
+    const [isvalidePrenom, setisValidePrenom] = useState(true);
+    const [isvalideEmail, setisValideEmail] = useState(true);
+    const [isvalideTel, setisValideTel] = useState(true);
+    const [isvalideProfession, setisValideProfession] = useState(true);
+    const [isvalideLocalisation, setisValideLocalisation] = useState(true);
+    const [isvalideMotdepasse, setisValideMotdepasse] = useState(true);
+    const [isvalideConfirmMotdepasse, setisValideConfirmMotdepasse] = useState(true);
+
     
-    const [loading,setLoading] = useState(false);
-    
-    const [nom,setNom] = useState('');
-    const [prenom,setPrenom] = useState('');
-    const [email,setemail] = useState('');
-    const [motdepasse,setmotdepasse] = useState('');
-    const [confirm_motdepasse,setConfirm_motdepasse] = useState('');
-    const [datenaissance,setDatenaissance] = useState('2000-01-01');
-    const [localisation,setLocalisation] = useState('');
-    const [telephone,setTelephone] = useState('');
-    const [profession,setProfession] = useState('');
-    const [niveau,setniveau] = useState('niveau');
-    const [textchange,settextchange] = useState(false);
-    const [secureTextEntry,setSecureTextEntry] = useState(true);
-    const [confirm_secureTextEntry,setConfirm_secureTextEntry] = useState(true);
-    if(loading)
-    {
-        return <View style={{flex: 1,justifyContent: "center",flexDirection: "row",
-        justifyContent: "space-around",padding: 10}}>
+    function handleValidNom(val) {
+        if (val.trim().length >= 4) {
+            setisValideNom(true);
+        } else {
+            setisValideNom(false);
+        }
+    }
+    function handleValidPrenom(val) {
+        if (val.trim().length >= 4) {
+            setisValidePrenom(true);
+        } else {
+            setisValidePrenom(false);
+        }
+    }
+    function handleValidEmail(val) {
+        const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(val) === false) {
+            setisValideEmail(false)
+        }
+        else {
+
+            setisValideEmail(true);
+
+        }
+    }
+
+    function handleValidTel(val) {
+
+        if (val.trim().length == 8) {
+            setisValideTel(true);
+        } else {
+            setisValideTel(false);
+        }
+    }
+    function handleValidProfession(val) {
+        if (val.trim().length >= 4) {
+            setisValideProfession(true);
+        } else {
+            setisValideProfession(false);
+        }
+    }
+    function handleValidLocalisation(val) {
+        if (val.trim().length >= 4) {
+            setisValideLocalisation(true);
+        } else {
+            setisValideLocalisation(false);
+        }
+    }
+    function handleValidMotdepasse(val) {
+        if (val.trim().length >= 8) {
+            setisValideMotdepasse(true);
+        } else {
+            setisValideMotdepasse(false);
+        }
+    }
+    function handleConfirmMotdepasse(val) {
+        if (val == motdepasse) {
+            setisValideConfirmMotdepasse(true);
+        } else {
+            setisValideConfirmMotdepasse(false);
+        }
+    }
+    if (loading) {
+        return <View style={{
+            flex: 1, justifyContent: "center", flexDirection: "row",
+            justifyContent: "space-around", padding: 10
+        }}>
             <ActivityIndicator size="large" color="#00ff00" /></View>
     }
 
@@ -44,10 +119,10 @@ const CreerCompte = (props) => {
             </View>
             <Animatable.View animation="fadeInUpBig"
                 style={styles.footer}>
-                <ScrollView 
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-            >
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                >
 
                     <View style={{
                         flexDirection: 'row', borderBottomWidth: 1,
@@ -59,20 +134,19 @@ const CreerCompte = (props) => {
                             placeholder="Nom"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(nom) =>{ 
+                            onChangeText={(nom) => {
                                 setNom(nom)
                             }}
+                            onEndEditing={(e) => handleValidNom(e.nativeEvent.text)}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
+
                     </View>
+                    {isvalideNom ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Nom doit etre plus que 4 caractères</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
 
@@ -80,20 +154,18 @@ const CreerCompte = (props) => {
                             placeholder="Prénom"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(prenom) =>{ 
+                            onChangeText={(prenom) => {
                                 setPrenom(prenom)
                             }}
+                            onEndEditing={(e) => handleValidPrenom(e.nativeEvent.text)}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
                     </View>
+                    {isvalidePrenom ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Prénom doit etre plus que 4 caractères</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
 
@@ -101,20 +173,21 @@ const CreerCompte = (props) => {
                             placeholder="Adresse Email"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(email) =>{ 
-                                setemail(email)
+                            keyboardType="email-address"
+                            textContentType="emailAddress"
+
+                            onChangeText={(email) => {
+                                setEmail(email)
                             }}
+                            onEndEditing={(e) => handleValidEmail(e.nativeEvent.text)}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
                     </View>
+                    {isvalideEmail ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Veillez saisir une adresse email valide</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
 
@@ -122,21 +195,19 @@ const CreerCompte = (props) => {
                             placeholder="Numéro de Télephone"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(telephone) =>{ 
+                            keyboardType={'numeric'}
+                            onChangeText={(telephone) => {
                                 setTelephone(telephone)
                             }}
-                            keyboardType={'numeric'} 
+                            onEndEditing={(e) => handleValidTel(e.nativeEvent.text)}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
                     </View>
+                    {isvalideTel ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Numéro de télèphone doit contenir 8 chiffres</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
 
@@ -144,20 +215,18 @@ const CreerCompte = (props) => {
                             placeholder="Profession"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(profession) =>{
+                            onEndEditing={(e) => handleValidProfession(e.nativeEvent.text)}
+                            onChangeText={(profession) => {
                                 setProfession(profession)
                             }}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
                     </View>
+                    {isvalideProfession ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Profession doit contenir plus que 5 caractères</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
 
@@ -165,50 +234,48 @@ const CreerCompte = (props) => {
                             placeholder="Localisation"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(localisation) =>{
+                            onEndEditing={(e) => handleValidLocalisation(e.nativeEvent.text)}
+                            onChangeText={(localisation) => {
                                 setLocalisation(localisation)
                             }}
                         />
-                        {textchange ?
-                            <Animatable.View
-                                animation="bounceIn">
-                                <Icon
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View> : null}
+
                     </View>
+                    {isvalideLocalisation ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Localisation doit contenir plus que 5 caractères</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
-                    <DatePicker
-    style={{width: 200}}
-    date={datenaissance}
-    mode="date"
-    format="YYYY-MM-DD"
-    minDate="1950-01-01"
-    maxDate="2007-01-01"
-    confirmBtnText="Confirm"
-    cancelBtnText="Cancel"
-    customStyles={{
-      dateIcon: {
-        position: 'absolute',
-        left: 0,
-        top: 4,
-        marginLeft: 50
-      },
-      dateInput: {
-        marginLeft: 96
-      }
-    }}
-    onDateChange={(date) => setDatenaissance(date) }
-  />
+                        <DatePicker
+                            style={{ width: 200 }}
+                            date={datenaissance}
+                            mode="date"
+                            format="YYYY-MM-DD"
+                            minDate="1950-01-01"
+                            maxDate="2007-01-01"
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 50
+                                },
+                                dateInput: {
+                                    marginLeft: 96
+                                }
+                            }}
+                            onDateChange={(date) => setDatenaissance(date)}
+                        />
                     </View>
                     <View style={styles.action}>
                         <Picker
                             selectedValue={niveau}
                             style={{ height: 50, width: 150, color: '#05375a' }}
-                            onValueChange={(itemValue, itemIndex) =>{setniveau(itemValue) }
+                            onValueChange={(itemValue, itemIndex) => { setniveau(itemValue) }
                             }
                         >
 
@@ -230,9 +297,11 @@ const CreerCompte = (props) => {
                             style={styles.textInput}
                             autoCapitalize="none"
                             onChangeText={(val) => setmotdepasse(val)}
+                            onEndEditing={(e) => handleValidMotdepasse(e.nativeEvent.text)}
+
                         />
                         <TouchableOpacity
-                            onPress={() => {  setSecureTextEntry(!secureTextEntry) } }
+                            onPress={() => { setsecureTextEntry(!secureTextEntry) }}
                         >
                             {secureTextEntry ?
                                 <Icon
@@ -251,7 +320,11 @@ const CreerCompte = (props) => {
                             }
                         </TouchableOpacity>
                     </View>
-
+                    {isvalideMotdepasse ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Mot de passe doit contenir plus que 8 caractères</Text>
+                        </Animatable.View>
+                    }
 
                     <View style={styles.action}>
                         <Icon
@@ -265,6 +338,7 @@ const CreerCompte = (props) => {
                             secureTextEntry={confirm_secureTextEntry ? true : false}
                             style={styles.textInput}
                             autoCapitalize="none"
+                            onEndEditing={(e) => handleConfirmMotdepasse(e.nativeEvent.text)}
                             onChangeText={(val) => setConfirm_motdepasse(val)}
                         />
                         <TouchableOpacity
@@ -287,18 +361,22 @@ const CreerCompte = (props) => {
                             }
                         </TouchableOpacity>
                     </View>
-
+                    {isvalideConfirmMotdepasse ? null :
+                        <Animatable.View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg} > Mot de passe incorrect</Text>
+                        </Animatable.View>
+                    }
                     <View style={styles.button}>
                         <TouchableOpacity
                             style={styles.signIn}
                             onPress={async () => {
-                                
+
                                 setLoading(true);
-                                await signup({nom,prenom,email,motdepasse,datenaissance,localisation,telephone,profession,niveau},props.navigation.navigate)
-                                
+                                await signup({ nom, prenom, email, motdepasse, datenaissance, localisation, telephone, profession, niveau }, props.navigation.navigate)
+
                                 setLoading(false);
-                        }}
-                        >                           
+                            }}
+                        >
                             <LinearGradient
                                 colors={['#08d4c4', '#00EAA1']}
                                 style={styles.signIn}
@@ -389,7 +467,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 9,
         color: 'grey'
-    }
+    },
+    errorMsg: {
+        color: '#ff0000',
+        fontSize: 14
+    },
 
 
 })

@@ -21,7 +21,7 @@ const CreerCompte = (props) => {
     const [prenom, setPrenom] = useState('');
     const [email, setEmail] = useState('');
     const [motdepasse, setmotdepasse] = useState('');
-    const [datenaissance, setDatenaissance] = useState('2000-01-01');
+    const [datenaissance, setDatenaissance] = useState('');
     const [localisation, setLocalisation] = useState('');
     const [telephone, setTelephone] = useState('');
     const [profession, setProfession] = useState('');
@@ -58,6 +58,7 @@ const CreerCompte = (props) => {
     }
     function handleValidEmail(val) {
         const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        
         if (reg.test(val) === false) {
             setisValideEmail(false)
         }
@@ -176,8 +177,8 @@ const CreerCompte = (props) => {
                             keyboardType="email-address"
                             textContentType="emailAddress"
 
-                            onChangeText={(email) => {
-                                setEmail(email)
+                            onChangeText={(value) => {
+                                setEmail({email:value.trim()})
                             }}
                             onEndEditing={(e) => handleValidEmail(e.nativeEvent.text)}
                         />
@@ -228,19 +229,42 @@ const CreerCompte = (props) => {
                         </Animatable.View>
                     }
 
-                    <View style={styles.action}>
+<View style={styles.action}>
 
-                        <TextInput
-                            placeholder="Localisation"
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onEndEditing={(e) => handleValidLocalisation(e.nativeEvent.text)}
-                            onChangeText={(localisation) => {
-                                setLocalisation(localisation)
-                            }}
-                        />
+<Picker
+        selectedValue={localisation}
+        style={{ height: 50, width: 150, color: '#05375a' }}
+        onValueChange={(itemValue, itemIndex) => { setLocalisation(itemValue) }
+        }
+    >
 
-                    </View>
+        <Picker.Item label="Ariana" value="ariana" />
+        <Picker.Item label="Beja" value="beja" />
+        <Picker.Item label="Ben Arous" value="ben arous" />
+        <Picker.Item label="Bizerte" value="bizerte" />
+        <Picker.Item label="Gabes" value="gabes" />
+        <Picker.Item label="Gafsa" value="gafsa" />
+        <Picker.Item label="Jendouba" value="jendouba" />
+        <Picker.Item label="Kairouan" value="kairouan" />
+        <Picker.Item label="kasserine" value="kasserine" />
+        <Picker.Item label="Kébili" value="kebili" />
+        <Picker.Item label="Le Kef" value="le kef" />
+        <Picker.Item label="Mahdia" value="mahdia" />
+        <Picker.Item label="Manouba" value="manouba" />
+        <Picker.Item label="Médenine" value="medenine" />
+        <Picker.Item label="Monastir" value="monastir" />
+        <Picker.Item label="Sfax" value="sfax" />
+        <Picker.Item label="Sid Bouzid" value="sidi bouzid" />
+        <Picker.Item label="Siliana" value="siliana" />
+        <Picker.Item label="Sousse" value="sousse" />
+        <Picker.Item label="Tataouine" value="tataouine" />
+        <Picker.Item label="Tozeur" value="tozeur" />
+        <Picker.Item label="Tunis" value="tunis" />
+        <Picker.Item label="Zaghouan" value="zaghouan" />
+
+    </Picker>
+    
+</View>
                     {isvalideLocalisation ? null :
                         <Animatable.View animation="fadeInLeft" duration={500}>
                             <Text style={styles.errorMsg} > Localisation doit contenir plus que 5 caractères</Text>
@@ -248,9 +272,12 @@ const CreerCompte = (props) => {
                     }
 
                     <View style={styles.action}>
+                        {/* <Text>Date de naissance:</Text> */}
                         <DatePicker
                             style={{ width: 200 }}
                             date={datenaissance}
+                            //value={datenaissance}
+                            placeholder="Date de naiisance"
                             mode="date"
                             format="YYYY-MM-DD"
                             minDate="1950-01-01"
@@ -262,10 +289,11 @@ const CreerCompte = (props) => {
                                     position: 'absolute',
                                     left: 0,
                                     top: 4,
-                                    marginLeft: 50
+                                    marginLeft: 10
                                 },
                                 dateInput: {
-                                    marginLeft: 96
+                                   
+                                    left:10
                                 }
                             }}
                             onDateChange={(date) => setDatenaissance(date)}
@@ -370,9 +398,9 @@ const CreerCompte = (props) => {
                         <TouchableOpacity
                             style={styles.signIn}
                             onPress={async () => {
-
+                                    console.log({ nom, prenom, email:email.email, motdepasse, datenaissance, localisation, telephone, profession, niveau });
                                 setLoading(true);
-                                await signup({ nom, prenom, email, motdepasse, datenaissance, localisation, telephone, profession, niveau }, props.navigation.navigate)
+                                await signup({ nom, prenom, email:email.email, motdepasse, datenaissance, localisation, telephone, profession, niveau }, props.navigation.navigate)
 
                                 setLoading(false);
                             }}

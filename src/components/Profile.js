@@ -20,10 +20,14 @@ const Profile = (props) => {
             const  [niveau,setniveau]=useState('');
 
 useEffect(() => {
+    userr();
+}, [state]);
+const userr= () =>{
     setTimeout(    async () => {
        
         const user = await AsyncStorage.getItem('iduser');
     console.log(user);
+    console.log('from state',state);
     
     const response = await tachkilaApi.post('/user',{userid:user});
     const joueur=response.data;
@@ -42,16 +46,17 @@ useEffect(() => {
 
     
    
-},0)
-
-
-}, [state]);
+},500)
+}
     return (
         <View style={styles.container}>
             
             <View style={styles.iconUser}>
+            <TouchableOpacity onPress={userr}>
                 <MaterialCommunityIcons name="account-circle" color={'#00818A'} size={80} />
+                </TouchableOpacity>
             </View>
+            
 
             <Animatable.View animation="fadeInUpBig"
                 style={styles.footer}>
@@ -64,16 +69,16 @@ useEffect(() => {
                         <Text style={styles.text}>Date de naissance : {Moment(dateDeNaissance).format('DD MM YYYY')} </Text>
                         <Text style={styles.text}>Localisation : {localisation}</Text>
                         <Text style={styles.text}>Niveau : {niveau}</Text>
-                        <TouchableOpacity onPress={() => props.navigation.navigate('Edit')}>
+                        <TouchableOpacity onPress={() => props.navigation.navigate('Edit',{
+                            user:{ nom, prenom, email, datenaissance:dateDeNaissance, localisation, telephone:tel, profession, niveau }
+                        })}>
                             <Text style={styles.edit} >Modifier mes infos</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.bouton}>
                         <TouchableOpacity onPress={ () => {
                             
-                                
-                                props.navigation.navigate('Connexion');
-                        
+                            signout(props.navigation.navigate)
                             
                         }}>
                             <Text style={styles.deconnexion}>Déconnexion</Text>

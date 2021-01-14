@@ -1,7 +1,7 @@
 import React, { useContext,useState,useEffect } from 'react'
 import  AsyncStorage  from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
-import { View, StyleSheet, Text, ScrollView ,Button} from 'react-native'
+import { View, StyleSheet, Text, ScrollView ,Button,ActivityIndicator} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-community/picker'
@@ -91,7 +91,12 @@ const Create = (props) => {
     
     
     }, [state]);
-
+    if(loading)
+    {
+        return <View style={{flex: 1,justifyContent: "center",flexDirection: "row",
+        justifyContent: "space-around",padding: 10}}>
+            <ActivityIndicator size="large" color="#00ff00" /></View>
+    }else
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -174,35 +179,58 @@ const Create = (props) => {
 
                     <View style={styles.action}>
 
-                        <TextInput
-                            placeholder="Localisation"
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={(localisation) => setLocalisation(localisation)}
-                            onEndEditing={(e) => handleValidLocalisation(e.nativeEvent.text)}
-                        />
+                    <Picker
+                            selectedValue={localisation}
+                            style={{ height: 50, width: 150, color: '#05375a' }}
+                            onValueChange={(itemValue, itemIndex) => { setLocalisation(itemValue) }
+                            }
+                        >
+
+                            <Picker.Item label="Ariana" value="ariana" />
+                            <Picker.Item label="Beja" value="beja" />
+                            <Picker.Item label="Ben Arous" value="ben arous" />
+                            <Picker.Item label="Bizerte" value="bizerte" />
+                            <Picker.Item label="Gabes" value="gabes" />
+                            <Picker.Item label="Gafsa" value="gafsa" />
+                            <Picker.Item label="Jendouba" value="jendouba" />
+                            <Picker.Item label="Kairouan" value="kairouan" />
+                            <Picker.Item label="kasserine" value="kasserine" />
+                            <Picker.Item label="Kébili" value="kebili" />
+                            <Picker.Item label="Le Kef" value="le kef" />
+                            <Picker.Item label="Mahdia" value="mahdia" />
+                            <Picker.Item label="Manouba" value="manouba" />
+                            <Picker.Item label="Médenine" value="medenine" />
+                            <Picker.Item label="Monastir" value="monastir" />
+                            <Picker.Item label="Sfax" value="sfax" />
+                            <Picker.Item label="Sid Bouzid" value="sidi bouzid" />
+                            <Picker.Item label="Siliana" value="siliana" />
+                            <Picker.Item label="Sousse" value="sousse" />
+                            <Picker.Item label="Tataouine" value="tataouine" />
+                            <Picker.Item label="Tozeur" value="tozeur" />
+                            <Picker.Item label="Tunis" value="tunis" />
+                            <Picker.Item label="Zaghouan" value="zaghouan" />
+
+                        </Picker>
                         
                     </View>
-                    {isValideLocalisation ? null :
-                        <Animatable.View animation="fadeInLeft" duration={500}>
-                            <Text style={styles.errorMsg} >Localisation doit contenir plus que 5 caractères</Text>
-                        </Animatable.View>
-                    }
+                   
 
 
                     <View style={styles.action}>
                     <View>
       <View>
-        <Button onPress={showDatepicker} title="Show date picker!" />
+        <TouchableOpacity onPress={showDatepicker}>
+            <Text style={{ color: '#05375a', marginBottom: 10 }}>Date de la partie</Text></TouchableOpacity>
       </View>
       <View>
-        <Button onPress={showTimepicker} title="Show date picker!" />
+      <TouchableOpacity onPress={showTimepicker}><Text style={{ color: '#05375a', marginBottom: 10 }}>Heure de la partie</Text></TouchableOpacity>
       </View>
       {show && (
         <DateTimePicker
           testID="dateTimePicker"
           value={dateestime}
           mode={mode}
+          minimumDate={new Date()}
           is24Hour={true}
           display="default"
           onChange={onChange}

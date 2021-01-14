@@ -1,21 +1,41 @@
 import React from 'react';
 import { View, StyleSheet, Text} from 'react-native';
-import ChatItem from './chat/ChatItem'
-import chatRooms from '../components/chat/ChatRooms'
+import ChatItem from './chat/ChatItemRejoint'
+import api from '../api/tachkila';
+import { useEffect, useState ,useContext} from 'react';
+import { Context as AuthContext } from '../context/AuthContext';
 import { FlatList } from 'react-native-gesture-handler';
+
 export default function GroupeRejoint(){
-    
-        return(
-            <View>
-                <FlatList 
-                style={{width:"100%"}}
-                data={chatRooms}
-                renderItem={({item}) => <ChatItem chatRoom={item} />}
-                keyExtractor={(item)=> item.id}
-                />
-            </View>
-        )
-    
-}
+    const { state} = useContext(AuthContext);
+    // const [user,setUser] =useState();
+  
+    const [parties,setParties] =useState([]);
 
+    const loadParties =() =>{
+        api.get('/parties').then(res =>{
+           setParties(res.data)
+        })
+       
+    }
 
+    useEffect(()=>{
+        loadParties();
+        
+    },[]);
+    
+       
+            return(
+                <View>
+                    <FlatList 
+                    data={parties}
+                    renderItem={({item}) => <ChatItem partie={item} />}
+                    keyExtractor={(item)=> item._id}
+                    />
+                </View>
+            )
+        
+    }
+    
+    
+    

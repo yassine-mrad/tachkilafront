@@ -29,23 +29,52 @@ class Liste extends Component {
     
     componentDidMount() {
         
-        const token  = this.context;
-        console.log(token); 
+        
         this.loadMessages();
       }
     loadMessages =() =>{
         instance.get('/parties').then(res =>{
-            this.setState({messages:res.data})
-            console.log('/messages/index', res.data);
-            console.log('/index', res.data.titre);
+             const tab=res.data.reverse();
+            this.setState({dataBackup: tab,
+                dataSource: tab,})
+            
         })
     }
+    contains = ({ titre, localisation }, query) => {
+
+        if (titre.toLowerCase().includes(query) || localisation.toLowerCase().includes(query)) {
+          return true;
+        }
+    
+        return false;
+      };
+      filterItem = event => {
+        var query = event.nativeEvent.text;
+        this.setState({
+          query: query,
+        });
+        if (query == '') {
+          this.setState({
+            dataSource: this.state.dataBackup,
+          });
+        } else {
+          var data = this.state.dataBackup;
+          query = query.toLowerCase();
+          
+          data = data.filter(l => { return this.contains(l, query) });
+          this.setState({
+            dataSource: data,
+          });
+        }
+      };
    
     constructor(props) {
        
         super(props);
-        this.state = { sampleText: 'Rejoindre' ,
-                        messages:null};
+        this.state = {  query: null,
+            dataSource: [],
+            dataBackup: [],
+            sampleText: 'Rejoindre',};
         
        
     }
@@ -94,6 +123,7 @@ class Liste extends Component {
     render() {
      
         return (
+            
 
             <View style={styles.container} >
 
@@ -122,15 +152,23 @@ class Liste extends Component {
                                 color: '#00818A',
                             }
                         } />
-                        <TextInput placeholder="Search" style={{ fontSize: 24, marginLeft: 15 }}></TextInput>
+                       <TextInput  placeholder="Chercher une partie" style={{ fontSize: 15, marginLeft: 15 }} value={this.state.query} onChange={this.filterItem.bind(this)}></TextInput>
+                        <TouchableOpacity onPress={this.loadMessages} ><View style={{ fontSize: 24, marginLeft: 105 }}><FontAwesome5 name={'redo-alt'} style={
+                            {
+                                fontSize: 24,
+                                color: '#00818A',
+                            }
+                        } /></View></TouchableOpacity>
                     </View>
 
                 </View>
+                
                 <FlatList
-                    data={this.state.messages}
-                    renderItem={this.renderItem}
-                    keyExtractor={item => item._id.toString()}
-                />
+         showsVerticalScrollIndicator={false}
+          data={this.state.dataSource}
+          renderItem={this.renderItem}
+          keyExtractor={item => item._id.toString()}
+        />
 
             </View>
         );

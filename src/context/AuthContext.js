@@ -8,7 +8,7 @@ const authReducer = (state, action) => {
         case 'add_error':
             return { ...state, errorMessage: action.payload };
         case 'signin':
-            return { errorMessage: '', token: action.payload };
+            return { errorMessage: '', token: action.payload.token,iduser:action.payload.iduser };
         case 'clear_error_mrssage':
                 return { ...state , errorMessage: '' };
         case 'signout':
@@ -21,8 +21,9 @@ const authReducer = (state, action) => {
 };
 const tryLocalSignin = (dispatch) => async (nav) => {
         const token = await AsyncStorage.getItem('token');
+        const iduser = await AsyncStorage.getItem('iduser');
         if(token){
-            dispatch({ type: 'signin', payload: token });
+            dispatch({ type: 'signin', payload: {token: token,iduser:iduser} });
             nav('TabNavigator');
         }else{
             nav('Acceuil');
@@ -37,7 +38,7 @@ const signup = (dispatch) => async ({nom,prenom,email,motdepasse,datenaissance,l
             await AsyncStorage.setItem('token', response.data.token);
             await AsyncStorage.setItem('iduser', response.data.userid);
             
-            dispatch({ type: 'signin', payload: response.data.token });
+            dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid} });
             nav('TabNavigator');
 
         } catch (err) {
@@ -46,11 +47,33 @@ const signup = (dispatch) => async ({nom,prenom,email,motdepasse,datenaissance,l
             dispatch({ type: 'add_error', payload: 'Une erreur s\'est produite lors de l\'inscription'})
         }
     };
+
+    const updateUser = (dispatch) => async ({nom,prenom,email,datenaissance,localisation,telephone,profession,niveau,userid},nav) => {
+        try {
+            console.log({nom,prenom,email,datenaissance,localisation,telephone,profession,niveau,userid});
+             await tachkilaApi.post('/updateuser',{userid,nom,prenom,email,datenaissance,localisation,telephone,profession,niveau});
+            
+            
+            nav('TabNavigator');
+
+        } catch (err) {
+            alert('Verifier vos information')
+            console.log(err);
+            dispatch({ type: 'add_error', payload: 'Une erreur s\'est produite lors de l\'inscription'})
+        }
+    };
+
+
+
     const partie = (dispatch) => async ({userId,titre,a,niveau,dateestime,localisation,description,tranchedage}, nav) => {
         
-       console.log({userId,titre,a,niveau,dateestime,localisation,description,tranchedage});
+      try
+      { console.log({userId,titre,a,niveau,dateestime,localisation,description,tranchedage});
         const response = await tachkilaApi.post('/partie', {userId:userId,titre,nombre:a,niveau,dateestime,localisation,description,tranchedage})
         nav('Liste');
+    }catch(err){
+        alert('Verifier vos information')
+    }
                 
               
                
@@ -67,7 +90,7 @@ const signin = (dispatch) => async ({email,motdepasse},nav) => {
         const response = await tachkilaApi.post('/signin',{email,motdepasse});
         await AsyncStorage.setItem('token', response.data.token);
         await AsyncStorage.setItem('iduser', response.data.userid);
-        dispatch({ type: 'signin', payload: response.data.token });
+        dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid} });
         nav('TabNavigator');
 
     } catch (err) {
@@ -94,6 +117,6 @@ const clearErrorMessage = (dispatch) => () => {
 
     export const { Provider, Context } = createDataContext(
         authReducer,
-        { signup, signin, signout, clearErrorMessage, tryLocalSignin, partie },
-        { token: null, errorMessage: '' }
+        { signup, signin, signout, clearErrorMessage, tryLocalSignin, partie ,updateUser},
+        { token: null, errorMessage: '',iduser: null }
     );

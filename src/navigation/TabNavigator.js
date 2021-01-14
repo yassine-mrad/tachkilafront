@@ -8,12 +8,15 @@ import Message from '../components/Message';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ListeStacckscreen from './ListeStacckscreen';
+import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
 
 const Tab = createBottomTabNavigator()
 const TabNavigator = () => {
     return <Tab.Navigator>
         <Tab.Screen name='Liste' component={ListeStacckscreen}
+            onIconPressed={ReloadInstructions}
             options={{
+                
                 tabBarIcon: ({ color }) => (
                     <MaterialCommunityIcons name="home" color={color} size={26} />
                 ),

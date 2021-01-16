@@ -6,6 +6,7 @@ import { useRoute } from '@react-navigation/native';
 
 import io from "socket.io-client";
 import { GiftedChat } from 'react-native-gifted-chat'
+import { PATH } from '../../api/tachkila';
 
 
 
@@ -49,7 +50,7 @@ const DiscussionRejoint = (props)=>{
 
 
     useEffect(() => {
-        const socket = io("http://192.168.1.32:3000/");
+        const socket = io(PATH+'/');
         socket.on(partieId.toString(), msg => {
           console.log("msg",msg);
           setMessages(previousMessages => GiftedChat.append(previousMessages, msg))
@@ -63,7 +64,7 @@ const DiscussionRejoint = (props)=>{
 
     const onSend = useCallback((messages = []) => {
       console.log("heeeee",state.user);
-        const socket = io("http://192.168.1.32:3000/");
+        const socket = io(PATH+'/');
        
         socket.emit('message', {messages,partieId,user:state.iduser});
         

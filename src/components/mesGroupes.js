@@ -16,6 +16,7 @@ export default function mesGroupes(){
     
   
     const loadParties =() =>{
+        setParties([])
         api.post('/mesParties',{userId:state.iduser}).then(res =>{
             console.log(res.data)
            setParties(res.data)

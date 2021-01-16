@@ -19,13 +19,20 @@ const Profile = (props) => {
             const  [localisation,setlocalisation]=useState('');
             const  [niveau,setniveau]=useState('');
 
-useEffect(() => {
+
+            useEffect(() => {
+                userr();
+                
+            }, []);
+            useEffect(() => {
     userr();
+    
 }, [state]);
-const userr= () =>{
-    setTimeout(    async () => {
-       
-        const user = await AsyncStorage.getItem('iduser');
+
+const userr=async () =>{
+   
+       console.log("from stateeeee",state);
+        const user = state.iduser;
     console.log(user);
     console.log('from state',state);
     
@@ -44,9 +51,7 @@ const userr= () =>{
     setemail(joueur.data.email);
     console.log(nom);
 
-    
-   
-},500)
+    return null;
 }
     return (
         <View style={styles.container}>

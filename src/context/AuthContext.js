@@ -8,7 +8,7 @@ const authReducer = (state, action) => {
         case 'add_error':
             return { ...state, errorMessage: action.payload };
         case 'signin':
-            return { errorMessage: '', token: action.payload.token,iduser:action.payload.iduser };
+            return { errorMessage: '', token: action.payload.token,iduser:action.payload.iduser ,user:action.payload.user};
         case 'clear_error_mrssage':
                 return { ...state , errorMessage: '' };
         case 'signout':
@@ -23,7 +23,9 @@ const tryLocalSignin = (dispatch) => async (nav) => {
         const token = await AsyncStorage.getItem('token');
         const iduser = await AsyncStorage.getItem('iduser');
         if(token){
-            dispatch({ type: 'signin', payload: {token: token,iduser:iduser} });
+            const response = await tachkilaApi.post('/user',{userid:iduser});
+            
+            dispatch({ type: 'signin', payload: {token: token,iduser:iduser,user:response.data} });
             nav('TabNavigator');
         }else{
             nav('Acceuil');
@@ -37,8 +39,8 @@ const signup = (dispatch) => async ({nom,prenom,email,motdepasse,datenaissance,l
             console.log(response.data);
             await AsyncStorage.setItem('token', response.data.token);
             await AsyncStorage.setItem('iduser', response.data.userid);
-            
-            dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid} });
+            const useer = await tachkilaApi.post('/user',{userid:response.data.userid});
+            dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid,user:useer.data} });
             nav('TabNavigator');
 
         } catch (err) {
@@ -90,7 +92,9 @@ const signin = (dispatch) => async ({email,motdepasse},nav) => {
         const response = await tachkilaApi.post('/signin',{email,motdepasse});
         await AsyncStorage.setItem('token', response.data.token);
         await AsyncStorage.setItem('iduser', response.data.userid);
-        dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid} });
+        
+        const useer = await tachkilaApi.post('/user',{userid:response.data.userid});
+        dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid,user:useer.data} });
         nav('TabNavigator');
 
     } catch (err) {

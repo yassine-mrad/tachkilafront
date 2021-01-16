@@ -1,165 +1,103 @@
-import React from 'react'
-import {  View,ImageBackground }from 'react-native'
-import moment from 'moment'
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler'
+import React, { useState,useEffect ,useCallback,useContext} from 'react';
 import api from '../../api/tachkila';
-import {io} from 'socket.io-client'
-import {StyleSheet,Text} from 'react-native'
-import Icon  from 'react-native-vector-icons/FontAwesome';
-import { TextInput } from 'react-native-gesture-handler';
-import { useEffect, useState ,useContext} from 'react';
 import { Context as AuthContext } from '../../context/AuthContext';
 import { useRoute } from '@react-navigation/native';
+//import liraries
+
+import io from "socket.io-client";
+import { GiftedChat } from 'react-native-gifted-chat'
 
 
 
-const DiscussionRejoint = ()=>{
+const DiscussionRejoint = (props)=>{
+    
     const route=useRoute();
-    const { state} = useContext(AuthContext);
-    console.log(state)
-    console.log(route)
+    const { state } = useContext(AuthContext);
    // const name =route.params.name;
     const partieId =route.params.id;
-
+    console.log(partieId); 
+    const [users,setUsers]= useState([]);
+    const [messages, setMessages] = useState([]);
     const [useer1,setUseer1] =useState([]);
-    const [messages,setMessages] =useState([]);
     const [inputMessage,setInputMessage] =useState("");
-
-   
-
-    const loadMessages =() =>{
-        console.log(partieId)
-        api.post('/messages',{partieId:partieId}).then(res =>{
-            setMessages(res.data.reverse());
-            
-            // console.log('/messages/index', res.data);
-
-            api.post('/userName',{_id:state.userid}).then(res =>{                
-               // console.log('/messages/index', res.data);
-                setUseer1(res.data.nom+" "+res.data.prenom)
-            })
-        })
-    
-    }
-
-    
-
-
-    const onSocket =() =>{
-        const socket = io('https://2853fcdc1fd7.ngrok.io/');
-         
-        socket.on('message',(res)=>{
-             
-            setMessages(messages=>[res.contenue,...messages]);
-            console.log('onSocket',res.contenue);
-            //console.log(messages)
-         })
-        
-    }
-    const submitMessage=()=>{
-        
-        if(inputMessage.length ===0){
-            return;
+    useEffect(()=>{ 
+        initialisationMessages();
+    },[])
+    const  initialisationMessages = async ()=>{
+        const response = await api.post('/messages',{partieId:partieId});
+        console.log(response.data);
+        const messagess=response.data;
+        const tab=[];
+        for(let i=0;i<messagess.length;i++)
+        {
+            tab.push( {
+                _id: messagess[i]._id,
+                text: messagess[i].contenue,
+                createdAt: messagess[i].date,
+                user: { 
+                  _id: messagess[i].userId,
+                  name: messagess[i].nom,
+                },
+              })
         }
-        const Data={
-           userId:state.userid,
-           partieId:partieId,
-            contenue:inputMessage
-        }        
-        api.post('/message',Data).then(()=>{
-        })
-        setInputMessage("");
-    }
-    useEffect(()=>{
-        loadMessages();
-        onSocket();
+        tab.reverse();
+        setMessages(tab)
         
-       
-    },[true]);
-    
 
-    const RenderItem=(item)=>{
-       // console.log("msguser",item.userId)
-           // console.log("userconnected",state.userid)
+    }
+
+
+
+    useEffect(() => {
+        const socket = io("http://192.168.1.32:3000/");
+        socket.on(partieId.toString(), msg => {
+          console.log("msg",msg);
+          setMessages(previousMessages => GiftedChat.append(previousMessages, msg))
           
-        return (
-            <View >
-                <View style={[styles.messageBox,
-                {backgroundColor:item.userId===state.userid ? '#DCF8C5':'#e5e5e5',marginLeft: item.userId===state.userid ? 50 : 0 ,
-            marginRight: item.userId===state.userid ? 0:50} ]}>
-                  { item.userId!==state.userid && <Text style={styles.name}>{useer1}</Text>}
-                        <Text style={styles.content}> {item.contenue}</Text>
-                        <Text style={styles.time}>{moment(item.date).fromNow()}</Text>
-                 </View>
+          return () => {
+            disconnectSocket();
+          }
+         });
+         
+      }, [])
+
+    const onSend = useCallback((messages = []) => {
+      console.log("heeeee",state.user);
+        const socket = io("http://192.168.1.32:3000/");
+       
+        socket.emit('message', {messages,partieId,user:state.iduser});
         
-        </View>
-        )
-    }
+      }, [])
+
+    return (/*<View style={{flex:1}}>
+        {chatMessagess}
+        
+        
+         
+            <View style={styles.container}>
+            
+            <TextInput
+              style={{height: 40, borderWidth: 2}}
+              autoCorrect={false}
+              value={chatMessage}
+              onSubmitEditing={() => submitChatMessage()}
+              onChangeText={chatMessage => {
+                setChatMessage(chatMessage)
+              }}
+            />
+          </View>
+          </View>*/  
+            <GiftedChat
+            renderUsernameOnMessage={true}
+              messages={messages}
+              onSend={messages => onSend(messages)}
+              user={{
+                _id: state.iduser,
+                name: state.user.data.prenom + ' ' +state.user.data.nom,
+              }}
+            />
+          );
+
     
-  
-        
-    return (
-            <View  style={{marginBottom:10}}>
-             <ImageBackground style={{width:'100%', height:'100%'}}source={require('../../../assets/bg.jpg')}>
-            <FlatList 
-            style={{flex:1,padding:10,marginBottom:10}}
-            data={messages}
-           inverted
-           scrollEnabled
-            renderItem={({item}) => RenderItem (item) }
-           keyExtractor={(item, index) => 'key'+index}
-           
-        />
-
-             <View style={styles.container}>
-                <TextInput style={styles.textInput} multiline placeholder="Votre Message" 
-                onChangeText={e=>setInputMessage(e)}
-                value={inputMessage}
-                ></TextInput>
-                <TouchableOpacity onPress={submitMessage}>
-                <Icon style={{marginTop:18}}name="send" size={24} color="#00818A" />
-                </TouchableOpacity>
-                
-        </View>
-            </ImageBackground> 
-        
-        </View>
-    )
 }
-
-
 export default DiscussionRejoint;
-const styles=StyleSheet.create({
-    container:{
-        flexDirection:'row'
-    
-
-        
-    },
-    messageBox:{
-        borderRadius:5,
-        padding:8,
-        marginBottom:8
-    },
-   textInput:{
-       margin:10,
-       backgroundColor:'white',
-       borderRadius:40,
-       height:40,
-       width:'83%'
-   },
- 
-time:{
-    alignSelf:'flex-end',
-    color:'grey'
-},
-content:{
-    fontSize:15,
-    fontStyle:'italic'   
-},
-name:{
-    color:'#00818A',
-    fontWeight:'bold',
-    marginBottom:5
-}
-})

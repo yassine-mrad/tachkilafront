@@ -14,7 +14,20 @@ export default function GroupeRejoint(){
 
     const loadParties =() =>{
         api.get('/parties').then(res =>{
-           setParties(res.data)
+        const parties=res.data;
+        const partieRejoin=[]
+        for(let i=0;i<parties.length;i++)
+        {
+            for(let j=0;j<parties[i].membre.length;j++){
+                if(parties[i].membre[j]===state.iduser){
+                    partieRejoin.push(parties[i])
+                }
+            }
+        }
+
+
+
+           setParties(partieRejoin)
         })
        
     }

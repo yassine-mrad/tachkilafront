@@ -1,4 +1,4 @@
-import React, { Component ,useContext} from 'react';
+import React, { useEffect ,useContext} from 'react';
 import { View, StyleSheet, Text, ScrollView, Button } from 'react-native';
 import * as Animatable from 'react-native-animatable'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -14,25 +14,41 @@ import api from '../api/tachkila';
 const DetailsPartie = () => {
     const route = useRoute();
     const data = route.params.data;
+    const f=route.params.f;
     const navigation = useNavigation();
     const [max, setMax] = useState(data.nombre);
     const [dispo, setDispo] = useState(data.membre.length);
 
     const { state} = useContext(AuthContext);
 
-    const [rejoindre,setRejoindre]=useState("Rejoindre");
+    const [rejoindre,setRejoindre]=useState(false);
 
     const ajouterMembre=()=>{
-        api.put('/ajouterMembre',{idpartie:data._id,userid:state.userid}).then(res =>{
-            console.log("membreeee",res.data)
-            
-                setRejoindre("Ajouté")
-                
-
-        })
+        
+        if(!rejoindre){
+            api.put('/ajouterMembre',{idpartie:data._id,userid:state.iduser}).then(res =>{
+                console.log("membreeee",res.data)
+                    
+            })
+        }
+        else{
+            api.put('/effacerMembre',{idpartie:data._id,userid:state.iduser}).then(res =>{
+                console.log("membreeee",res.data)
+                    
+            })
+        }
+        
+        
     }
     
-
+    useEffect(()=>{
+        for(let i=0;i<data.membre.length;i++)
+        {
+            if(data.membre[i]===state.iduser){
+                setRejoindre(true)
+            }
+        }
+    },[])
 
     return (
 

@@ -27,18 +27,29 @@ import Moment from 'moment'
 class Liste extends Component {
     static contextType = AuthContext;
     
-    componentDidMount() {
+   async componentDidMount() {
+    this.setState({dataBackup: null,
+        dataSource:null,})
+        const a= await instance.get('/parties');
+        console.log(a.data);
+        const tab=a.data;
+        tab.reverse();
+        this.setState({dataBackup: tab,
+            dataSource:tab,})
         
-        
-        this.loadMessages();
       }
-    loadMessages =() =>{
-        instance.get('/parties').then(res =>{
-             const tab=res.data.reverse();
-            this.setState({dataBackup: tab,
-                dataSource: tab,})
+    loadMessages =async() =>{
+        this.setState({dataBackup: null,
+            dataSource:null,})
+        const a= await instance.get('/parties');
+        console.log(a.data);
+        const tab=a.data;
+        tab.reverse();
+        this.setState({dataBackup: tab,
+            dataSource:tab,})
             
-        })
+            
+        
     }
     contains = ({ titre, localisation }, query) => {
 

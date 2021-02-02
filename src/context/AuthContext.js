@@ -1,126 +1,234 @@
-import  AsyncStorage  from '@react-native-async-storage/async-storage';
-import createDataContext from './createDataContext' ;
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import createDataContext from './createDataContext';
 import tachkilaApi from '../api/tachkila';
-import { navigate } from '../navigationRef';
+import {navigate} from '../navigationRef';
 
 const authReducer = (state, action) => {
-    switch (action.type) {
-        case 'add_error':
-            return { ...state, errorMessage: action.payload };
-        case 'signin':
-            return { errorMessage: '', token: action.payload.token,iduser:action.payload.iduser ,user:action.payload.user};
-        case 'clear_error_mrssage':
-                return { ...state , errorMessage: '' };
-        case 'signout':
-            return { token:null , errorMessage: '' };
-        case 'addpartie':
-            return { ...state, partiess: action.payload};
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case 'add_error':
+      return {...state, errorMessage: action.payload};
+    case 'signin':
+      return {
+        errorMessage: '',
+        token: action.payload.token,
+        iduser: action.payload.iduser,
+        user: action.payload.user,
+      };
+    case 'clear_error_mrssage':
+      return {...state, errorMessage: ''};
+    case 'signout':
+      return {token: null, errorMessage: ''};
+    case 'addpartie':
+      return {...state, partiess: action.payload};
+    default:
+      return state;
+  }
 };
 const tryLocalSignin = (dispatch) => async (nav) => {
-        const token = await AsyncStorage.getItem('token');
-        const iduser = await AsyncStorage.getItem('iduser');
-        if(token){
-            const response = await tachkilaApi.post('/user',{userid:iduser});
-            
-            dispatch({ type: 'signin', payload: {token: token,iduser:iduser,user:response.data} });
-            nav('TabNavigator');
-        }else{
-            nav('Acceuil');
-        }
-    };
+  const token = await AsyncStorage.getItem('token');
+  const iduser = await AsyncStorage.getItem('iduser');
+  if (token) {
+    const response = await tachkilaApi.post('/user', {userid: iduser});
 
+    dispatch({
+      type: 'signin',
+      payload: {token: token, iduser: iduser, user: response.data},
+    });
+    nav('TabNavigator');
+  } else {
+    nav('Acceuil');
+  }
+};
 
-const signup = (dispatch) => async ({nom,prenom,email,motdepasse,datenaissance,localisation,telephone,profession,niveau},nav) => {
-        try {
-            const response = await tachkilaApi.post('/signup',{nom,prenom,email,motdepasse,datenaissance,localisation,telephone,profession,niveau});
-            console.log(response.data);
-            await AsyncStorage.setItem('token', response.data.token);
-            await AsyncStorage.setItem('iduser', response.data.userid);
-            const useer = await tachkilaApi.post('/user',{userid:response.data.userid});
-            dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid,user:useer.data} });
-            nav('TabNavigator');
+const signup = (dispatch) => async (
+  {
+    nom,
+    prenom,
+    email,
+    motdepasse,
+    datenaissance,
+    localisation,
+    telephone,
+    profession,
+    niveau,
+  },
+  nav,
+) => {
+  try {
+    const response = await tachkilaApi.post('/signup', {
+      nom,
+      prenom,
+      email,
+      motdepasse,
+      datenaissance,
+      localisation,
+      telephone,
+      profession,
+      niveau,
+    });
+    console.log(response.data);
+    await AsyncStorage.setItem('token', response.data.token);
+    await AsyncStorage.setItem('iduser', response.data.userid);
+    const useer = await tachkilaApi.post('/user', {
+      userid: response.data.userid,
+    });
+    dispatch({
+      type: 'signin',
+      payload: {
+        token: response.data.token,
+        iduser: response.data.userid,
+        user: useer.data,
+      },
+    });
+    nav('TabNavigator');
+  } catch (err) {
+    alert('Verifier vos information');
+    console.log(err);
+    dispatch({
+      type: 'add_error',
+      payload: "Une erreur s'est produite lors de l'inscription",
+    });
+  }
+};
 
-        } catch (err) {
-            alert('Verifier vos information')
-            console.log(err);
-            dispatch({ type: 'add_error', payload: 'Une erreur s\'est produite lors de l\'inscription'})
-        }
-    };
+const updateUser = (dispatch) => async (
+  {
+    nom,
+    prenom,
+    email,
+    datenaissance,
+    localisation,
+    telephone,
+    profession,
+    niveau,
+    userid,
+  },
+  nav,
+) => {
+  try {
+    console.log({
+      nom,
+      prenom,
+      email,
+      datenaissance,
+      localisation,
+      telephone,
+      profession,
+      niveau,
+      userid,
+    });
+    await tachkilaApi.post('/updateuser', {
+      userid,
+      nom,
+      prenom,
+      email,
+      datenaissance,
+      localisation,
+      telephone,
+      profession,
+      niveau,
+    });
 
-    const updateUser = (dispatch) => async ({nom,prenom,email,datenaissance,localisation,telephone,profession,niveau,userid},nav) => {
-        try {
-            console.log({nom,prenom,email,datenaissance,localisation,telephone,profession,niveau,userid});
-             await tachkilaApi.post('/updateuser',{userid,nom,prenom,email,datenaissance,localisation,telephone,profession,niveau});
-            
-            
-            nav('TabNavigator');
+    nav('TabNavigator');
+  } catch (err) {
+    alert('Verifier vos information');
+    console.log(err);
+    dispatch({
+      type: 'add_error',
+      payload: "Une erreur s'est produite lors de l'inscription",
+    });
+  }
+};
 
-        } catch (err) {
-            alert('Verifier vos information')
-            console.log(err);
-            dispatch({ type: 'add_error', payload: 'Une erreur s\'est produite lors de l\'inscription'})
-        }
-    };
+const partie = (dispatch) => async (
+  {
+    userId,
+    titre,
+    a,
+    niveau,
+    dateestime,
+    localisation,
+    description,
+    tranchedage,
+  },
+  nav,
+) => {
+  try {
+    console.log({
+      userId,
+      titre,
+      a,
+      niveau,
+      dateestime,
+      localisation,
+      description,
+      tranchedage,
+    });
+    const response = await tachkilaApi.post('/partie', {
+      userId: userId,
+      titre,
+      nombre: a,
+      niveau,
+      dateestime,
+      localisation,
+      description,
+      tranchedage,
+    });
+    nav('Liste');
+  } catch (err) {
+    alert('Verifier vos information');
+  }
+};
 
+const signin = (dispatch) => async ({email, motdepasse}, nav) => {
+  try {
+    const response = await tachkilaApi.post('/signin', {email, motdepasse});
+    await AsyncStorage.setItem('token', response.data.token);
+    await AsyncStorage.setItem('iduser', response.data.userid);
 
-
-    const partie = (dispatch) => async ({userId,titre,a,niveau,dateestime,localisation,description,tranchedage}, nav) => {
-        
-      try
-      { console.log({userId,titre,a,niveau,dateestime,localisation,description,tranchedage});
-        const response = await tachkilaApi.post('/partie', {userId:userId,titre,nombre:a,niveau,dateestime,localisation,description,tranchedage})
-        nav('Liste');
-    }catch(err){
-        alert('Verifier vos information')
-    }
-                
-              
-               
-            
-         
-            
-    
-       
-    };
-
-
-const signin = (dispatch) => async ({email,motdepasse},nav) => {
-    try {
-        const response = await tachkilaApi.post('/signin',{email,motdepasse});
-        await AsyncStorage.setItem('token', response.data.token);
-        await AsyncStorage.setItem('iduser', response.data.userid);
-        
-        const useer = await tachkilaApi.post('/user',{userid:response.data.userid});
-        dispatch({ type: 'signin', payload: {token:response.data.token,iduser:response.data.userid,user:useer.data} });
-        nav('TabNavigator');
-
-    } catch (err) {
-        dispatch({ type: 'add_error', payload: 'Une erreur s\'est produite lors de la connexion'})
-        alert('Login ou mot de passe est invalide')
-    }
-    };
+    const useer = await tachkilaApi.post('/user', {
+      userid: response.data.userid,
+    });
+    dispatch({
+      type: 'signin',
+      payload: {
+        token: response.data.token,
+        iduser: response.data.userid,
+        user: useer.data,
+      },
+    });
+    nav('TabNavigator');
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: "Une erreur s'est produite lors de la connexion",
+    });
+    alert('Login ou mot de passe est invalide');
+  }
+};
 
 const signout = (dispatch) => async (nav) => {
-        await AsyncStorage.removeItem('iduser');
-        await AsyncStorage.removeItem('token');
-        nav('Connexion');
-        
+  await AsyncStorage.removeItem('iduser');
+  await AsyncStorage.removeItem('token');
+  nav('Connexion');
 
-        dispatch({type:'signout'});
-
-        
-    };
+  dispatch({type: 'signout'});
+};
 
 const clearErrorMessage = (dispatch) => () => {
-    dispatch({ type: 'clear_error_mrssage'});
-    };
+  dispatch({type: 'clear_error_mrssage'});
+};
 
-
-    export const { Provider, Context } = createDataContext(
-        authReducer,
-        { signup, signin, signout, clearErrorMessage, tryLocalSignin, partie ,updateUser},
-        { token: null, errorMessage: '',iduser: null }
-    );
+export const {Provider, Context} = createDataContext(
+  authReducer,
+  {
+    signup,
+    signin,
+    signout,
+    clearErrorMessage,
+    tryLocalSignin,
+    partie,
+    updateUser,
+  },
+  {token: null, errorMessage: '', iduser: null},
+);
